@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joo Master Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* --- THEME COLORS (DEFAULT: DARK MODE - BLACK/VIOLET) --- */
+        :root {
+            /* Core Backgrounds & Text */
+            --text-color: white;
+            --primary-bg: #121212; /* Near Black */
+            --secondary-bg: #2a2a2a; /* Dark gray */
+            
+            /* Game Box & Default Button */
+            --game-box-bg: #1e1e1e; /* Dark container background */
+            --game-box-text: white;
+
+            /* Accent Colors (Semi-light Purple/Violet) */
+            --secondary-color: #A87ED1; /* Primary Violet Accent */
+            --accent-color: #FFD700; /* Gold/Yellow for stats */
+            --success-color: #5cb85c; /* Green for matches/success */
+            
+            /* Neon/Home Screen Accents */
+            --neon-primary: #D1A8E9; /* Lighter Purple for Glow */
+            --neon-secondary: #A87ED1; /* Primary Purple */
+            --neon-play-btn: #A87ED1; /* Purple Play Button */
+            
+            /* Game Specific */
+            --card-back-color: #2a2a2a;
+            --card-front-bg: white;
+            --card-front-text: #121212;
+            --card-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
+            --card-hover-shadow: 0 12px 20px rgba(0, 0, 0, 0.8);
+
+            /* Transitions for smooth theme switching */
+            transition: all 0.5s ease-in-out;
+        }
+
+        /* --- LIGHT MODE OVERRIDES --- */
+        .light-mode {
+            --text-color: #333;
+            --primary-bg: #f0f4ff;
+            --secondary-bg: #eef1f5;
+            --game-box-bg: white;
+            --game-box-text: #333;
+            --secondary-color: #7A4EAB; /* Darker Purple for contrast */
+            --card-back-color: #7A4EAB; 
+            --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            --card-hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+            --card-front-text: #1e1e2d;
+            
+            /* Light mode specific neon/glow */
+            --neon-primary: #7A4EAB; 
+            --neon-secondary: #5A3681;
+            --neon-play-btn: #7A4EAB;
+        }
+
+        /* --- BASE STYLES & BACKGROUND --- */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Keep RTL direction for general aesthetics and user context, even if content is English */
+            direction: rtl; 
+            
+            /* Black background with subtle violet gradient */
+            background-color: var(--primary-bg); 
+            background-image: radial-gradient(circle at top left, rgba(168, 126, 209, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at bottom right, rgba(168, 126, 209, 0.15) 0%, transparent 50%);
+            
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; 
+            width: 100vw; 
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            transition: background-color 0.5s, color 0.5s;
+        }
+        
+        .light-mode body {
+            background-color: #f0f4ff;
+            background-image: none;
+        }
+
+        .game-container {
+            position: relative;
+            width: 95%;
+            max-width: 650px; 
+            background: var(--game-box-bg);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            color: var(--game-box-text);
+            margin: 20px 0;
+            transition: background 0.5s, box-shadow 0.5s;
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            font-weight: 900;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        /* --- LOGO STYLES --- */
+        .logo-icon-container {
+            margin-bottom: 20px;
+            font-size: 5em;
+            color: white; 
+            text-shadow: 0 0 15px var(--neon-primary), 0 0 30px var(--neon-secondary);
+            animation: pulseGlow 2s infinite alternate;
+        }
+        
+        @keyframes pulseGlow {
+            0% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+        /* --- END LOGO STYLES --- */
+
+
+        /* --- HOME SCREEN STYLES (CYBER/VIOLET) --- */
+        #home-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            width: 95%;
+            max-width: 400px;
+            height: 90vh;
+            min-height: 600px;
+            background: var(--primary-bg); 
+            padding: 40px 20px;
+            border-radius: 25px;
+            box-shadow: 0 0 20px rgba(168, 126, 209, 0.4), 0 0 40px rgba(209, 168, 233, 0.3);
+            color: var(--text-color);
+            margin: 20px 0;
+            transition: all 0.5s ease-in-out;
+        }
+        
+        /* The giant Play button container */
+        .play-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            flex-grow: 1;
+        }
+        
+        #home-screen-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-top: 0;
+            text-align: center;
+            color: white; 
+            text-shadow: 0 0 10px var(--neon-secondary), 0 0 20px var(--neon-primary);
+        }
+        
+        /* BIG PLAY BUTTON STYLE */
+        #play-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid var(--neon-primary);
+            background-color: var(--neon-play-btn);
+            color: white;
+            font-size: 3em;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--neon-primary), inset 0 0 15px var(--neon-secondary);
+            transition: all 0.3s;
+            animation: playPulse 1.5s infinite alternate;
+        }
+
+        @keyframes playPulse {
+            0% { box-shadow: 0 0 10px var(--neon-primary), inset 0 0 10px var(--neon-secondary); }
+            100% { box-shadow: 0 0 30px var(--neon-primary), inset 0 0 25px var(--neon-secondary); }
+        }
+
+        #play-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Score Stats */
+        .score-stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+        }
+        
+        .stat-box {
+            text-align: center;
+        }
+        
+        .stat-box .label {
+            font-size: 0.9em;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+        
+        .stat-box .value {
+            font-size: 1.5em;
+            font-weight: 900;
+            color: var(--accent-color);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Footer Icons/Buttons - FIXED LAYOUT */
+        .home-footer-buttons {
+            display: flex;
+            justify-content: space-around; /* Distribute space evenly */
+            gap: 10px; 
+            width: 100%; 
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+        
+        .light-mode .home-footer-buttons {
+            border-top: 1px dashed rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-icon-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+            background-color: var(--secondary-color); 
+            color: white;
+        }
+        
+        .footer-icon-btn:active {
+            transform: scale(0.9);
+        }
+
+
+        /* --- GAME VIEW STYLES --- */
+
+        .control-panel {
+            position: absolute;
+            top: 15px;
+            right: 15px; /* RTL placement for control panel */
+            display: flex;
+            gap: 10px; 
+            align-items: center;
+            z-index: 10;
+        }
+        
+        /* Reusing the footer icon button style for the game control panel button */
+        #theme-switcher {
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #theme-switcher:active {
+            transform: scale(0.95);
+        }
+        
+        .level-display {
+            font-size: 1.1em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            background: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: var(--text-color);
+        }
+
+        .stat-item {
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .stat-item span {
+            color: var(--accent-color);
+            margin-left: 5px; /* Margin for numbers/icons */
+        }
+
+        /* --- GAME GRID & CARDS --- */
+        .game-grid {
+            display: grid;
+            gap: 8px;
+            perspective: 1000px;
+            margin: 20px 0;
+        }
+        
+        .card {
+            aspect-ratio: 1 / 1;
+            border-radius: 10px;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease-in-out, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .card:not(.flip):not(.match):hover {
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .card.flip {
+            transform: rotateY(180deg);
+            pointer-events: none;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: 900;
+        }
+        
+        @media (max-width: 600px) {
+            .card-face {
+                font-size: 1.5em;
+            }
+        }
+
+        .card-front {
+            background-color: var(--card-front-bg);
+            color: var(--card-front-text);
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            background: var(--card-back-color); 
+            color: white;
+            transition: background 0.5s;
+        }
+        
+        .card-back i {
+            font-size: 1.5em; 
+            opacity: 0.8;
+            color: var(--secondary-color);
+        }
+        
+        .card.match {
+            pointer-events: none;
+            box-shadow: 0 0 20px var(--success-color);
+        }
+
+        /* --- BUTTONS & FOOTER (Game View) --- */
+        .game-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #8C5EB8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #4b9e4b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Modal & Leaderboard Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            max-width: 90%;
+            text-align: center;
+            animation: fadeIn 0.3s ease-out;
+            color: #333;
+            direction: ltr; /* Force LTR for modal content */
+        }
+        
+        .leaderboard-container {
+            margin-top: 30px;
+            text-align: left; 
+            padding: 15px;
+            border-top: 2px solid #eef1f5;
+            direction: ltr;
+        }
+        
+        .leaderboard-list li {
+            list-style: none;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+        }
+        
+        .leaderboard-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* --- DEVELOPER PANEL STYLES --- */
+        .dev-panel {
+            width: 100%;
+            max-width: 800px;
+            min-height: 90vh;
+            background: var(--game-box-bg);
+            color: var(--game-box-text);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            margin: 20px 0;
+            text-align: left; /* LTR alignment for dev panel */
+            direction: ltr;
+        }
+        
+        .dev-panel h2 {
+            color: var(--secondary-color); 
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .config-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background-color: #222;
+        }
+        
+        .config-section label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--neon-primary);
+        }
+        
+        .config-section textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #555;
+            font-family: monospace;
+            font-size: 0.9em;
+            resize: vertical;
+            background-color: #121212;
+            color: white;
+            direction: ltr; 
+        }
+        
+        .dev-buttons {
+            display: flex;
+            justify-content: flex-start;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+        
+        .dev-note {
+            background-color: #3e3e0f;
+            color: #ffc107;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            border-left: 5px solid #ffc107; /* LTR border */
+            direction: ltr;
+            text-align: left;
+        }
+        
+        /* User ID Display Fix */
+        .user-id-display strong {
+             /* Force LTR display for the User ID string */
+            direction: ltr;
+            display: inline-block;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Home Screen -->
+    <div id="home-screen" style="display: none;">
+        
+        <!-- Logo Icon -->
+        <div class="logo-icon-container">
+            <i class="fas fa-brain"></i> 
+        </div>
+        
+        <h1 id="home-screen-title">Joo Master</h1>
+        
+        <!-- Big Play Button Area -->
+        <div class="play-area">
+            <button id="play-btn" title="Start Game">
+                <i class="fas fa-play"></i>
+            </button>
+            <p style="font-size: 1.1em; font-weight: 700; color: var(--neon-primary); margin-top: 30px; text-shadow: 0 0 5px var(--neon-primary);">
+                Powered by Youssef AI Company
+            </p>
+        </div>
+        
+        <!-- Score Stats -->
+        <div class="score-stats">
+            <div class="stat-box">
+                <div class="label">Your Best Score</div>
+                <div class="value" id="user-top-score">--</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">Global Best Moves</div>
+                <div class="value" id="game-best-score">--</div>
+            </div>
+        </div>
+
+        <!-- Footer Icons/Buttons -->
+        <div class="home-footer-buttons">
+            <button class="footer-icon-btn" id="leaderboard-btn" title="View Global Leaderboard">
+                <i class="fas fa-chart-bar"></i> 
+            </button>
+            <button class="footer-icon-btn" id="info-btn" title="Game Information">
+                <i class="fas fa-info-circle"></i> 
+            </button>
+            <button class="footer-icon-btn" id="dev-mode-access-btn" title="Access Developer Mode">
+                <i class="fas fa-tools"></i> 
+            </button>
+            <!-- Theme Switcher -->
+            <button class="footer-icon-btn" id="home-theme-switcher" title="Toggle Day/Night Mode">
+                <i class="fas fa-sun" id="home-theme-icon"></i> 
+            </button>
+        </div>
+        
+        <div class="user-id-display" style="margin-top: 10px; font-size: 0.8em; color: #777; font-weight: 700;">
+            User ID: <strong id="home-screen-user-id">Connecting...</strong>
+        </div>
+    </div>
+    
+    <!-- Main Game View (Hidden initially) -->
+    <div class="game-container" id="game-main-view" style="display: none;">
+        
+        <div class="control-panel">
+            <!-- Theme Switcher in Game View -->
+            <button id="theme-switcher" title="Toggle Day/Night Mode">
+                <i class="fas fa-sun" id="theme-icon"></i>
+            </button>
+        </div>
+        
+        <h1>Joo Master</h1>
+        <p class="level-display" id="level-title">Level 1: Easy (4x4 Grid)</p>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                Moves: <span id="moves-counter">0</span>
+            </div>
+            <div class="stat-item">
+                Matches: <span id="matches-counter">0</span>/8
+            </div>
+        </div>
+
+        <div class="game-grid" id="game-grid">
+            <!-- Game cards will be added here by JavaScript -->
+        </div>
+
+        <div class="game-buttons">
+            <button class="btn btn-primary" id="restart-btn">
+                <i class="fas fa-redo-alt"></i> Restart Level
+            </button>
+            <button class="btn btn-primary" id="go-home-btn">
+                <i class="fas fa-home"></i> Go Home
+            </button>
+        </div>
+
+        <div class="leaderboard-container" id="game-leaderboard-container">
+            <h2>Top 5 Global Scores</h2>
+            <ul class="leaderboard-list" id="leaderboard-list">
+                <li style="text-align: center; color: #999;">Loading Scores...</li>
+            </ul>
+        </div>
+        
+        <div class="user-id-display" style="direction: ltr; text-align: left; font-size: 0.8em; color: #777;">
+            Current User ID: <strong id="current-user-id">Connecting...</strong>
+        </div>
+    </div>
+    
+    <!-- Developer Panel -->
+    <div id="dev-panel" class="dev-panel" style="display: none;">
+        <h2>⚙️ Developer Settings Panel</h2>
+        
+        <div class="dev-note">
+            ⚠️ **Warning:** Edit only the JSON fields. Any syntax error will prevent loading new settings.
+        </div>
+
+        <div class="config-section">
+            <label for="dev-settings-textarea">Game Configuration (Icons & Levels):</label>
+            <textarea id="dev-settings-textarea" spellcheck="false"></textarea>
+            <p style="font-size: 0.8em; color: #999; margin-top: 5px;">Edit icons (Font Awesome HTML code) and levels (number of pairs and columns).</p>
+        </div>
+        
+        <div class="config-section">
+            <label for="dev-css-textarea">Theme & Styles (CSS Variables):</label>
+            <textarea id="dev-css-textarea" spellcheck="false"></textarea>
+            <p style="font-size: 0.8em; color: #999; margin-top: 5px;">Edit the main theme colors using **HEX** color codes.</p>
+        </div>
+        
+        <div class="dev-buttons">
+            <button class="btn btn-success" id="save-settings-btn">
+                <i class="fas fa-save"></i> Save & Close
+            </button>
+            <button class="btn" id="cancel-settings-btn" style="background-color: #dc3545; color: white;">
+                <i class="fas fa-times-circle"></i> Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer Signature -->
+    <footer id="signature" style="margin-top: 5px; padding: 5px; font-size: 0.8em; font-weight: 400; color: #777; background-color: transparent; margin-bottom: 20px; text-align: center; transition: color 0.5s;">
+        © <span id="copyright-year">2024</span> Youssef AI
+    </footer>
+
+    <!-- MODAL - Game Over -->
+    <div class="modal" id="game-over-modal">
+        <div class="modal-content">
+            <h2 id="modal-title"></h2>
+            <p id="modal-message"></p>
+            <div class="game-buttons" style="margin-top: 15px;">
+                <button class="btn btn-primary" id="modal-close-btn" onclick="document.getElementById('game-over-modal').style.display='none'">
+                    Close
+                </button>
+                <button class="btn btn-success" id="next-level-btn" style="display: none;">
+                    <i class="fas fa-angle-double-right"></i> Next Level
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL - Game Info -->
+    <div class="modal" id="info-modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 style="color: var(--secondary-color);">Game Information</h2>
+            <p style="text-align: center; margin-bottom: 20px; line-height: 1.6; font-weight: 500;">
+                **Joo Master** is a classic memory game where the objective is to match pairs of identical cards. Finish the level in the fewest moves possible to secure your spot on the Global Leaderboard!
+            </p>
+            <p style="font-size: 0.9em; text-align: center; border-top: 1px solid #eee; padding-top: 10px;">
+                Product of **Youssef AI Company**. <br>
+                © <span id="copyright-year-modal">2024</span> All rights reserved.
+            </p>
+            <div class="game-buttons" style="margin-top: 15px;">
+                <button class="btn btn-primary" onclick="document.getElementById('info-modal').style.display='none'">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL - Leaderboard -->
+    <div class="modal" id="leaderboard-modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 style="color: var(--secondary-color);">Top 5 Global Scores</h2>
+            <ul class="leaderboard-list" id="leaderboard-modal-list">
+                <li style="text-align: center; color: #999;">Loading Scores...</li>
+            </ul>
+            <div class="game-buttons" style="margin-top: 15px;">
+                <button class="btn btn-primary" onclick="document.getElementById('leaderboard-modal').style.display='none'">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL - Developer Password Prompt (FIXED SECURITY FLAW HERE) -->
+    <div class="modal" id="password-modal">
+        <div class="modal-content">
+            <h2 id="password-modal-title" style="color: var(--secondary-color);">Developer Mode Access</h2>
+            <p id="password-modal-message">
+                Please enter the password to confirm you are authorized to access the Developer Settings Panel.
+            </p>
+            
+            <div style="margin: 20px 0;">
+                <input type="password" id="password-input" placeholder="Enter password here" 
+                       style="padding: 10px; border-radius: 5px; border: 1px solid #ccc; width: 80%; max-width: 250px; color: #333; direction: ltr;">
+            </div>
+            
+            <div class="game-buttons" style="margin-top: 15px;">
+                <button class="btn btn-primary" id="submit-password-btn" style="margin: 0;">
+                    Submit
+                </button>
+                <button class="btn" style="background-color: #ccc; color: #333;" onclick="document.getElementById('password-modal').style.display='none';">
+                    Cancel
+                </button>
+            </div>
+            <p id="password-error-message" style="color: red; margin-top: 10px; display: none; font-size: 0.9em;"></p>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, onSnapshot, collection, query, orderBy, limit, setLogLevel, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- GAME CONFIGURATION (Default Settings) ---
+        const DEFAULT_GAME_SETTINGS = {
+            icons: [
+                '<i class="fas fa-star"></i>', '<i class="fas fa-heart"></i>', '<i class="fas fa-gem"></i>',
+                '<i class="fas fa-bomb"></i>', '<i class="fas fa-crown"></i>', '<i class="fas fa-moon"></i>',
+                '<i class="fas fa-sun"></i>', '<i class="fas fa-bell"></i>', '<i class="fas fa-feather-alt"></i>',
+                '<i class="fas fa-flask"></i>', '<i class="fas fa-bolt"></i>', '<i class="fas fa-anchor"></i>',
+            ],
+            levels: [
+                { pairs: 8, columns: 4, name: "Easy (4x4 Grid)", totalCards: 16 }, 
+                { pairs: 10, columns: 5, name: "Medium (4x5 Grid)", totalCards: 20 },
+                { pairs: 12, columns: 6, name: "Hard (4x6 Grid)", totalCards: 24 }
+            ],
+            // Key CSS variables exposed for editing (using default DARK MODE values)
+            cssVariables: {
+                '--card-back-color': '#2a2a2a',
+                '--secondary-color': '#A87ED1',
+                '--accent-color': '#FFD700',
+                '--success-color': '#5cb85c',
+            }
+        };
+
+        // Current game settings, modifiable by the developer panel
+        let GAME_SETTINGS = JSON.parse(JSON.stringify(DEFAULT_GAME_SETTINGS));
+        
+        const GAME_TITLE = "Joo Master Game"; 
+        // NOTE: The secret password is intentionally left in the JavaScript logic, but HIDDEN from the UI.
+        const SECRET_PASSWORD = "youssefai17012013..."; 
+        
+        // --- GAME STATE ---
+        let currentLevelIndex = 0;
+        let gameBoard = [];
+        let flippedCards = [];
+        let matchesFound = 0;
+        let moves = 0;
+        let canFlip = true;
+        
+        // --- DOM Elements ---
+        const bodyElement = document.body;
+        const homeScreen = document.getElementById('home-screen'); 
+        const playBtn = document.getElementById('play-btn'); 
+        const infoBtn = document.getElementById('info-btn'); 
+        const leaderboardBtn = document.getElementById('leaderboard-btn');
+        const devModeAccessBtn = document.getElementById('dev-mode-access-btn');
+        const goHomeBtn = document.getElementById('go-home-btn');
+        const infoModal = document.getElementById('info-modal'); 
+        const leaderboardModal = document.getElementById('leaderboard-modal');
+        const leaderboardModalList = document.getElementById('leaderboard-modal-list');
+        const gameMainView = document.getElementById('game-main-view');
+        
+        // Theme Switcher Elements
+        const themeSwitcher = document.getElementById('theme-switcher'); // Game View Button
+        const themeIcon = document.getElementById('theme-icon'); // Game View Icon
+        const homeThemeSwitcher = document.getElementById('home-theme-switcher'); // Home Screen Button
+        const homeThemeIcon = document.getElementById('home-theme-icon'); // Home Screen Icon
+
+        const gridElement = document.getElementById('game-grid');
+        const movesCounter = document.getElementById('moves-counter');
+        const matchesCounter = document.getElementById('matches-counter');
+        const levelTitle = document.getElementById('level-title');
+        const restartBtn = document.getElementById('restart-btn');
+        const modal = document.getElementById('game-over-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const nextLevelBtn = document.getElementById('next-level-btn');
+        const currentUserIdDisplay = document.getElementById('current-user-id');
+        const homeScreenUserIdDisplay = document.getElementById('home-screen-user-id'); 
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const copyrightYear = document.getElementById('copyright-year'); 
+        const copyrightYearModal = document.getElementById('copyright-year-modal'); 
+        const userTopScoreDisplay = document.getElementById('user-top-score');
+        const gameBestScoreDisplay = document.getElementById('game-best-score');
+
+        // Dev Mode Elements
+        const passwordModal = document.getElementById('password-modal');
+        const passwordInput = document.getElementById('password-input');
+        const submitPasswordBtn = document.getElementById('submit-password-btn');
+        const passwordErrorMessage = document.getElementById('password-error-message');
+        
+        // Developer Panel Elements
+        const devPanel = document.getElementById('dev-panel');
+        const devSettingsTextarea = document.getElementById('dev-settings-textarea');
+        const devCSSVariablesTextarea = document.getElementById('dev-css-textarea');
+        const saveSettingsBtn = document.getElementById('save-settings-btn');
+        const cancelSettingsBtn = document.getElementById('cancel-settings-btn');
+
+
+        // --- FIREBASE & LEADERBOARD SETUP ---
+        setLogLevel('Debug');
+        let db, auth, userId;
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-memory-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        /** Initializes Firebase and sets up the authentication listener. */
+        function initFirebase() {
+            if (!firebaseConfig) {
+                console.error("Firebase config not found. Leaderboard features disabled.");
+                currentUserIdDisplay.textContent = 'No DB';
+                homeScreenUserIdDisplay.textContent = 'No DB';
+                return;
+            }
+            
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+            } catch (error) {
+                 console.error("Error initializing Firebase App or services:", error);
+                 currentUserIdDisplay.textContent = 'DB Init Error';
+                 homeScreenUserIdDisplay.textContent = 'DB Init Error';
+                 return;
+            }
+
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    // Update user ID displays
+                    currentUserIdDisplay.textContent = userId;
+                    homeScreenUserIdDisplay.textContent = userId;
+                    startLeaderboardListener();
+                } else {
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Firebase authentication failed:", error);
+                        currentUserIdDisplay.textContent = 'Auth Failed';
+                        homeScreenUserIdDisplay.textContent = 'Auth Failed';
+                    }
+                }
+            });
+        }
+
+
+        const PUBLIC_COLLECTION_PATH = `artifacts/${appId}/public/data/memory_leaderboard`;
+
+        /** Fetches and displays the top 5 scores. */
+        function startLeaderboardListener() {
+            if (!db) {
+                renderLeaderboard(null, leaderboardList);
+                renderLeaderboard(null, leaderboardModalList);
+                return;
+            }
+            try {
+                // Fetch ALL scores 
+                const q = query(collection(db, PUBLIC_COLLECTION_PATH));
+                
+                onSnapshot(q, async (snapshot) => {
+                    const allScores = [];
+                    snapshot.forEach((doc) => {
+                        allScores.push(doc.data());
+                    });
+                    
+                    // Sort locally by moves (ascending)
+                    allScores.sort((a, b) => a.moves - b.moves);
+
+                    // Update Home Screen Stats
+                    updateHomeScores(allScores);
+
+                    // Render for both modals/views
+                    renderLeaderboard(allScores.slice(0, 5), leaderboardList); // Game View
+                    renderLeaderboard(allScores.slice(0, 5), leaderboardModalList); // Modal View
+                    
+                }, (error) => {
+                    console.error("Error listening to leaderboard:", error);
+                    renderLeaderboard(null, leaderboardList);
+                    renderLeaderboard(null, leaderboardModalList);
+                });
+
+            } catch(e) {
+                console.error("Failed to set up leaderboard listener:", e);
+                renderLeaderboard(null, leaderboardList);
+                renderLeaderboard(null, leaderboardModalList);
+            }
+        }
+        
+        /** Updates the user's top score and the global best score on the home screen. */
+        function updateHomeScores(allScores) {
+            if (!userId) {
+                userTopScoreDisplay.textContent = '--';
+                gameBestScoreDisplay.textContent = '--';
+                return;
+            }
+
+            // 1. Game Best Score (Lowest overall moves)
+            const globalBest = allScores.length > 0 ? allScores[0].moves : '--';
+            gameBestScoreDisplay.textContent = globalBest;
+
+            // 2. User Top Score (Lowest moves by the current user)
+            const userScores = allScores.filter(score => score.userId === userId);
+            const userBest = userScores.length > 0 ? userScores[0].moves : '--';
+            userTopScoreDisplay.textContent = userBest;
+        }
+
+        /** Renders the leaderboard list in the provided UL element. */
+        function renderLeaderboard(topScores, ulElement) {
+            ulElement.innerHTML = '';
+            if (!topScores || topScores.length === 0) {
+                ulElement.innerHTML = '<li style="text-align: center; color: #999;">No scores yet. Be the first!</li>';
+                return;
+            }
+            topScores.forEach((score, index) => {
+                const li = document.createElement('li');
+                li.className = 'leaderboard-item';
+                const date = new Date(score.timestamp.seconds * 1000);
+                const timeStr = date.toLocaleDateString();
+                const isCurrentUser = userId === score.userId;
+                
+                li.innerHTML = `
+                    <span class="date" style="font-size: 0.8em; color: #777;">(${timeStr})</span>
+                    <span class="score">${score.moves} Moves</span>
+                    <span class="player" style="${isCurrentUser ? 'font-weight: bold; color: var(--success-color);' : ''}">
+                        ${isCurrentUser ? 'You' : score.userId.substring(0, 8) + '...'}
+                    </span>
+                    <span class="rank">${index + 1}.</span>
+                `;
+                ulElement.appendChild(li);
+            });
+        }
+
+        /** Saves the current game score to the Firestore leaderboard. */
+        async function saveScore() {
+            if (!db || !userId) {
+                console.warn("Cannot save score: Firebase or user ID not available.");
+                return;
+            }
+            try {
+                await addDoc(collection(db, PUBLIC_COLLECTION_PATH), {
+                    userId: userId,
+                    moves: moves,
+                    timestamp: new Date(),
+                    game: GAME_TITLE,
+                    level: currentLevelIndex + 1
+                });
+                console.log("Score saved successfully!");
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+        }
+
+        // --- NAVIGATION LOGIC ---
+        
+        /** Transitions from home screen to game view and starts Level 1. */
+        function startGame() {
+            homeScreen.style.display = 'none';
+            gameMainView.style.display = 'block';
+            resetGame(0);
+        }
+
+        /** Switches to the Home Screen view. */
+        function goToHome() {
+            gameMainView.style.display = 'none';
+            devPanel.style.display = 'none';
+            homeScreen.style.display = 'flex';
+        }
+        
+        /** Shows the Info Modal. */
+        function openMoreInfoModal() {
+            infoModal.style.display = 'flex';
+        }
+
+        /** Shows the Leaderboard Modal. */
+        function openLeaderboardModal() {
+            leaderboardModal.style.display = 'flex';
+        }
+        
+        // --- GAME CORE LOGIC ---
+
+        /** Initializes the game board for the current level. */
+        function initializeBoard() {
+            const config = GAME_SETTINGS.levels[currentLevelIndex];
+            
+            levelTitle.textContent = `Level ${currentLevelIndex + 1}: ${config.name}`;
+            matchesCounter.textContent = `0/${config.pairs}`;
+            
+            // 1. Select the icons needed for this level (two of each)
+            const availableIcons = GAME_SETTINGS.icons.slice(0, config.pairs);
+            
+            // 2. Duplicate icons to create pairs
+            const cardValues = [...availableIcons, ...availableIcons];
+            
+            // 3. Shuffle all cards randomly using Fisher-Yates algorithm
+            gameBoard = shuffle(cardValues);
+            
+            gridElement.innerHTML = ''; 
+            gridElement.style.gridTemplateColumns = `repeat(${config.columns}, 1fr)`;
+            
+            // 4. Build the game board
+            gameBoard.forEach((value, index) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.setAttribute('data-index', index);
+                
+                const cardBack = document.createElement('div');
+                cardBack.classList.add('card-face', 'card-back');
+                cardBack.innerHTML = `<i class="fas fa-question"></i>`;
+
+                const cardFront = document.createElement('div');
+                cardFront.classList.add('card-face', 'card-front');
+                cardFront.innerHTML = value;
+
+                card.appendChild(cardBack);
+                card.appendChild(cardFront);
+
+                card.addEventListener('click', () => handleCardClick(card));
+                gridElement.appendChild(card);
+            });
+        }
+
+        /** Shuffles an array using the Fisher-Yates algorithm. */
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                // Pick a remaining element.
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+
+                // And swap it with the current element.
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+
+        /** Resets game state and re-initializes the board. */
+        function resetGame(levelIndex = 0) {
+            currentLevelIndex = levelIndex;
+            flippedCards = [];
+            matchesFound = 0;
+            moves = 0;
+            canFlip = true;
+            
+            movesCounter.textContent = '0';
+            modal.style.display = 'none';
+            
+            initializeBoard();
+        }
+
+        /** Handles the click/tap event on a card. */
+        function handleCardClick(card) {
+            if (!canFlip || card.classList.contains('flip') || card.classList.contains('match')) {
+                return;
+            }
+
+            card.classList.add('flip');
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                movesCounter.textContent = moves;
+                canFlip = false; 
+
+                setTimeout(checkForMatch, 800);
+            }
+        }
+
+        /** Checks if the two currently flipped cards are a match. */
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
+            const value1 = card1.querySelector('.card-front').innerHTML;
+            const value2 = card2.querySelector('.card-front').innerHTML;
+            const config = GAME_SETTINGS.levels[currentLevelIndex];
+
+            if (value1 === value2) {
+                card1.classList.add('match');
+                card2.classList.add('match');
+                matchesFound++;
+                matchesCounter.textContent = `${matchesFound}/${config.pairs}`;
+
+                // Subtle match visual feedback
+                card1.style.boxShadow = '0 0 15px var(--success-color), inset 0 0 10px var(--success-color)';
+                card2.style.boxShadow = '0 0 15px var(--success-color), inset 0 0 10px var(--success-color)';
+                
+                if (matchesFound === config.pairs) {
+                    gameOver();
+                }
+
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flip');
+                    card2.classList.remove('flip');
+                }, 800);
+            }
+
+            flippedCards = [];
+            canFlip = true;
+        }
+
+        /** Ends the game and displays the final score. */
+        function gameOver() {
+            const isFinalLevel = currentLevelIndex === GAME_SETTINGS.levels.length - 1;
+            
+            if (isFinalLevel) {
+                modalTitle.textContent = '🏆 Final Victory! 🏆';
+                modalMessage.innerHTML = `You completed all levels in <strong>${moves} moves</strong> (for this level). Great job!`;
+                nextLevelBtn.style.display = 'none';
+                modalCloseBtn.textContent = 'Go Home';
+                modalCloseBtn.onclick = goToHome;
+
+            } else {
+                modalTitle.textContent = '🎉 Level Complete! 🎉';
+                modalMessage.innerHTML = `Level ${currentLevelIndex + 1} solved in <strong>${moves} moves</strong>. Ready for the next challenge?`;
+                nextLevelBtn.style.display = 'inline-block';
+                modalCloseBtn.textContent = 'Go Home';
+                modalCloseBtn.onclick = goToHome;
+            }
+            
+            modal.style.display = 'flex';
+            saveScore();
+        }
+        
+        /** Moves to the next level. */
+        function goToNextLevel() {
+            if (currentLevelIndex < GAME_SETTINGS.levels.length - 1) {
+                resetGame(currentLevelIndex + 1);
+            }
+        }
+
+
+        // --- THEME LOGIC ---
+
+        /** Toggles between dark and light mode. */
+        function toggleTheme() {
+            const isLightMode = bodyElement.classList.toggle('light-mode');
+            
+            // Set the icon class based on the *new* state
+            const iconClass = isLightMode ? 'fa-moon' : 'fa-sun';
+            const oldIconClass = isLightMode ? 'fa-sun' : 'fa-moon';
+            
+            // Update icons for both buttons
+            themeIcon.classList.replace(oldIconClass, iconClass);
+            homeThemeIcon.classList.replace(oldIconClass, iconClass);
+            
+            // Save preference
+            localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+        }
+
+        /** Loads theme preference from local storage and applies it. */
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const isLight = savedTheme === 'light';
+            
+            if (isLight) {
+                bodyElement.classList.add('light-mode');
+            }
+            
+            // Set initial icons correctly for the loaded theme
+            const iconClass = isLight ? 'fa-moon' : 'fa-sun';
+            const oppositeIconClass = isLight ? 'fa-sun' : 'fa-moon';
+            
+            if (themeIcon) {
+                themeIcon.classList.replace(oppositeIconClass, iconClass);
+            }
+            if (homeThemeIcon) {
+                homeThemeIcon.classList.replace(oppositeIconClass, iconClass);
+            }
+        }
+        
+        // --- MODAL HELPER ---
+
+        /** Shows a generic custom modal for errors or success messages. */
+        function showModal(title, message, type = 'info') {
+            modalTitle.textContent = title;
+            modalMessage.innerHTML = message;
+            nextLevelBtn.style.display = 'none';
+            
+            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color').trim() || '#A87ED1';
+
+            if (type === 'error') {
+                modalTitle.style.color = '#dc3545';
+                modalCloseBtn.style.backgroundColor = '#dc3545';
+                modalCloseBtn.textContent = 'OK';
+                modalCloseBtn.onclick = () => { document.getElementById('game-over-modal').style.display='none'};
+            } else {
+                modalTitle.style.color = primaryColor;
+                modalCloseBtn.style.backgroundColor = primaryColor;
+                modalCloseBtn.textContent = 'Close';
+                modalCloseBtn.onclick = () => { document.getElementById('game-over-modal').style.display='none'};
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        
+        // --- DEV MODE & PANEL LOGIC ---
+        
+        /** Shows the password prompt modal. */
+        function showPasswordPrompt() {
+            passwordInput.value = ''; // Clear previous input
+            passwordErrorMessage.style.display = 'none';
+            passwordModal.style.display = 'flex';
+        }
+        
+        /** Checks the entered password. */
+        function checkPassword() {
+            const input = passwordInput.value.trim();
+            
+            if (input === SECRET_PASSWORD) {
+                passwordModal.style.display = 'none';
+                openDeveloperPanel(); // Open the new dev panel
+            } else {
+                // Failure
+                passwordErrorMessage.textContent = 'Incorrect password. Access denied.';
+                passwordErrorMessage.style.display = 'block';
+                passwordInput.value = '';
+            }
+        }
+        
+        /** Displays the Developer Panel and loads current settings. */
+        function openDeveloperPanel() {
+            // Hide all game views
+            gameMainView.style.display = 'none';
+            homeScreen.style.display = 'none';
+            modal.style.display = 'none';
+            passwordModal.style.display = 'none';
+            
+            // Show dev panel
+            devPanel.style.display = 'block';
+            
+            // Load current game settings (Icons and Levels)
+            const settingsToDisplay = {
+                icons: GAME_SETTINGS.icons,
+                levels: GAME_SETTINGS.levels
+            };
+            // Use 2 spaces for formatting
+            devSettingsTextarea.value = JSON.stringify(settingsToDisplay, null, 2);
+
+            // Load current CSS Variables
+            devCSSVariablesTextarea.value = JSON.stringify(GAME_SETTINGS.cssVariables, null, 2);
+        }
+        
+        /** Applies changes from the Developer Panel, then closes it and resets the game. */
+        function saveDeveloperSettings() {
+            let changesMade = false;
+            
+            // 1. Apply Game Configuration (Icons/Levels)
+            try {
+                const newSettings = JSON.parse(devSettingsTextarea.value);
+                
+                // Basic validation (check if they exist)
+                if (newSettings.icons && Array.isArray(newSettings.icons) && newSettings.levels && Array.isArray(newSettings.levels)) {
+                    GAME_SETTINGS.icons = newSettings.icons;
+                    GAME_SETTINGS.levels = newSettings.levels;
+                    changesMade = true;
+                } else {
+                    throw new Error("Invalid structure for Game Configuration. Must contain 'icons' (array of strings) and 'levels' (array of objects).");
+                }
+            } catch (e) {
+                showModal('Settings Save Error', `Invalid JSON in Game Configuration: ${e.message}`, 'error');
+                return; 
+            }
+
+            // 2. Apply CSS Variables
+            try {
+                const newCSS = JSON.parse(devCSSVariablesTextarea.value);
+                const root = document.documentElement;
+                
+                for (const [key, value] of Object.entries(newCSS)) {
+                    if (key.startsWith('--') && typeof value === 'string') {
+                         root.style.setProperty(key, value);
+                         // Update in GAME_SETTINGS for next dev panel load
+                         GAME_SETTINGS.cssVariables[key] = value; 
+                         changesMade = true;
+                    }
+                }
+            } catch (e) {
+                showModal('Styles Save Error', `Invalid JSON in Theme & Styles: ${e.message}`, 'error');
+                return;
+            }
+
+            // 3. Close and return to home screen (new behavior)
+            closeDeveloperPanel();
+            if (changesMade) {
+                showModal('Settings Saved!', 'New configuration applied. Please click "Play" to start a new game.', 'info');
+            }
+        }
+
+        /** Hides the Developer Panel and returns to the main game view. */
+        function closeDeveloperPanel() {
+            devPanel.style.display = 'none';
+            // Always return to home screen after dev mode
+            goToHome();
+        }
+        
+        /** Ignores changes and returns to the main game view. */
+        function cancelDeveloperSettings() {
+            closeDeveloperPanel();
+        }
+
+
+        // --- Event Listeners and Initial Load ---
+        restartBtn.addEventListener('click', () => resetGame(currentLevelIndex)); // Restart current level
+        nextLevelBtn.addEventListener('click', goToNextLevel);
+        
+        // Theme Switcher Listeners (Both home and game views)
+        themeSwitcher.addEventListener('click', toggleTheme);
+        homeThemeSwitcher.addEventListener('click', toggleTheme); 
+        
+        // Home Screen Listeners
+        playBtn.addEventListener('click', startGame); 
+        infoBtn.addEventListener('click', openMoreInfoModal);
+        leaderboardBtn.addEventListener('click', openLeaderboardModal);
+        devModeAccessBtn.addEventListener('click', showPasswordPrompt);
+        goHomeBtn.addEventListener('click', goToHome);
+        
+        // Dev Mode Listeners
+        submitPasswordBtn.addEventListener('click', checkPassword);
+        
+        // Developer Panel Listeners
+        saveSettingsBtn.addEventListener('click', saveDeveloperSettings);
+        cancelSettingsBtn.addEventListener('click', cancelDeveloperSettings);
+        
+        // Allow pressing Enter key to submit password
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+        
+        // Use DOMContentLoaded for fastest script execution after DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Load theme and static UI elements immediately
+            loadTheme();
+            const currentYear = new Date().getFullYear();
+            copyrightYear.textContent = currentYear; 
+            copyrightYearModal.textContent = currentYear;
+            
+            // 2. Show the home screen FIRST to ensure UI visibility
+            goToHome(); 
+            
+            // 3. Start Firebase initialization (asynchronous, less critical for immediate display)
+            initFirebase();
+        });
+
+    </script>
+</body>
+</html>
